@@ -1,0 +1,68 @@
+<resources>
+    <string name="app_name">News Feeder</string>
+    <string name="description">Several studies have shown that walking for just 20
+    minutes daily has positive effects on blood pressure, cholestron and it very effective</string>
+
+    <!--string for the menu item settings !-->
+    <string name="menu_item_settings">Settings</string>
+
+    <!--string for the settings  tile!-->
+    <string name="settings_title">NewsFeeder Settings</string>
+
+    <!-- Strings for the orderby-preference !-->
+    <string name="settings_orderby_label">Order By</string>
+    <string name="settings_order_by_key">order_by</string>
+    <string name="settings_orderby_default">@string/settings_orderby_newest_value</string>
+
+    <!--label for order by popularity option !-->
+    <string name="settings_orderby_oldest_label">Oldest</string>
+    <string name="settings_orderby_oldest_value">oldest</string>
+
+    <!-- label for order by latest option !-->
+    <string name="settings_orderby_newest_label">Newest</string>
+    <string name="settings_orderby_newest_value">newest</string>
+
+    <!-- label for order by top option !-->
+    <string name="settings_orderby_relevance_label">Relevance</string>
+    <string name="settings_orderby_relevance_value">relevance</string>
+
+    <!-- Strings for number of pages !-->
+    <string name="settings_page_size_label">Page Size</string>
+    <string name="settings_page_size_key">page_size</string>
+    <string name="settings_page_size_default">10</string>
+
+    <!-- String title for the oderby setting!-->
+    <string name="order_by_title">Order By</string>
+
+    <!-- String title for the page size setting !-->
+    <string name="page_size_title">Page Size</string>
+
+    <!-- Strings for the section objects !-->
+    <string name="technology_section">Technology</string>
+    <string name="sports_section">Sports</string>
+    <string name="politics_section">Politics</string>
+    <string name="business_section">Business</string>
+    <string name="culture_section">Culture</string>
+    <string name="education_section">Education</string>
+    <string name="film_section">Film</string>
+
+    <!-- Strings for the intent used to pass on the detail to the detailactivity !-->
+
+    <string name="putExtra_avatar_name" translatable="false">Avatar name</string>
+    <string name="putExtra_avatar_sub" translatable="false">Avatar sub</string>
+    <string name="putExtra_image_url" translatable="false">Image Url</string>
+    <string name="putExtra_description" translatable="false">Description</string>
+    <string name="putExtra_title" translatable="false">Title</string>
+    <string name="putExtra_name_initial_letter" translatable="false">First Letter</string>
+
+    <!-- String for the share icon in the detail activity !-->
+    <string name="share_icon_detail_activity">Share</string>
+    <!-- This string is used by the intent to open the detail activity !-->
+    <string name="detailActivityIntent">detailIntent</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="content_authority">com.example.android.newsfeeder</string>
+
+</resources>

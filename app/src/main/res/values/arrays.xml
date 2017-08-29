@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="settings_orderby_labels">
+        <item>@string/settings_orderby_newest_label</item>
+        <item>@string/settings_orderby_oldest_label</item>
+        <item>@string/settings_orderby_relevance_label</item>
+    </string-array>
+
+    <string-array name="settins_orderby_values">
+        <item>@string/settings_orderby_newest_value</item>
+        <item>@string/settings_orderby_oldest_value</item>
+        <item>@string/settings_orderby_relevance_value</item>
+    </string-array>
+</resources>

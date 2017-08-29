@@ -1,0 +1,35 @@
+<resources>
+
+    <!-- Base application theme.  We use this theme as we want to use the Toolbar.
+         To use the toolbar we have to disable the default action bar and this is how we do it-->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- This is the style that we use for the toolbar !-->
+    <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+        <!-- android:textColorPrimar is the color of the title text in the Toolbar !-->
+        <item name="android:textColorPrimary">@color/white</item>
+
+        <!-- android:actionMenuTextColor is the color of the text of the action items !-->
+        <item name="android:actionMenuTextColor">@color/white</item>
+
+        <!-- we use these attributes to have a ripple affect when we click on it !-->
+        <item name="android:selectableItemBackground">?android:selectableItemBackground</item>
+        <!---
+        <item name="android:selectableItemBackgroundBorderless">?android:selectableItemBackground</item>
+        !-->
+    </style>
+    
+    <!-- use this style to configure the title in the toolbar !-->
+    <style name="Toolbar.TitleText" parent="TextAppearance.Widget.AppCompat.Toolbar.Title">
+        
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
+
+        
+    </style>
+
+</resources>
