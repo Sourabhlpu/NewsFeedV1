@@ -5,12 +5,10 @@ import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
-import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -23,7 +21,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.personal.newsfeeder.data.NewsContract;
+import com.example.personal.newsfeeder.utilities.NetworkUtils;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,16 +34,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<TheArticle>>,
         RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler {
 
-    //this is the string that we will use to fetch the json data.
-    //for more details about this API refer to the following link --> http://open-platform.theguardian.com/explore/
-
-    private static final String NEWS_REQUEST_URL = "http://content.guardianapis.com/" +
-            "search";
     //we give the loader an id. This is just a random unique value.
     private static final int EARTHQUAKE_LOADER_ID = 1;
 
-    //The api key that we need to pass in with our request to the server of the Gaurdian
-    private static final String API_KEY = "ce10d58e-3c68-451c-beb3-7b6a79f5b75f";
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private static boolean isBookmarked = false;
@@ -54,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private LinearLayoutManager mLayoutManager;
     private TextView mEmptyTextView;
     private EndlessRecyclerViewScrollListener scrollListener;
-    private Uri.Builder uriBuilder;
+
     private  String page = "1";
 
     /*
@@ -63,55 +56,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
       * @param currentPage is passed in which is the page #.
      */
 
-    public String createAPIQueryString(String currentPage) {
-        Log.v(LOG_TAG, "The value of the page index " + currentPage);
 
-        //we fetch the settings the user has set to fetch the data in the settings activity.
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-
-        //we want to get the value of the user preference of the sort order of the articles
-        String orderBy = sharedPrefs.getString(getString(R.string.settings_order_by_key),
-                getString(R.string.settings_orderby_default));
-        // this setting of user will set that how many pages we want to load per query.
-        String pageSize = sharedPrefs.getString(getString(R.string.settings_page_size_key),
-                getString(R.string.settings_page_size_default));
-
-        /*
-         * now we are done with fetching the user preferences
-         * It is time  to create he uri. We will add the above user settings to the request url
-         */
-
-        //this takes the query string saved as string constant and converts it into a URI.
-        // Now we can use this uri to add parameters to it.
-
-        Uri baseUri = Uri.parse(NEWS_REQUEST_URL);
-        uriBuilder = baseUri.buildUpon();
-
-        if (orderBy.equals("oldest")) {
-            uriBuilder.appendQueryParameter("from-date", "2017-01-01");
-            uriBuilder.appendQueryParameter("use-date", "published");
-
-        }
-
-        /*
-          * this is the sample url that's created with a few appended parameters
-          * the following method adds the parameter to the uri
-           http://content.guardianapis.com/search?order-by=relevance&use-date=published&api-key=ce10d58e-3c68-451c-beb3-7b6a79f5b75f
-        */
-
-
-        uriBuilder.appendQueryParameter("order-by", orderBy);
-        uriBuilder.appendQueryParameter("show-fields", "byline,thumbnail,trailText,body");
-        uriBuilder.appendQueryParameter("page", currentPage);
-        uriBuilder.appendQueryParameter("page-size", pageSize);
-        uriBuilder.appendQueryParameter("api-key", API_KEY);
-
-
-
-        // convert the uri to string and then return it.
-        return uriBuilder.toString();
-
-    }
 
     //Overriding the three loader methods
 
@@ -125,11 +70,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<List<TheArticle>> onCreateLoader(int id, Bundle args) {
 
 
-        String queryString = createAPIQueryString(page);
+        URL queryUrl = NetworkUtils.createAPIQueryString(page,this);
 
-        Log.v("The url", LOG_TAG + uriBuilder.toString());
 
-        return new ArticleLoader(this, uriBuilder.toString());
+        return new ArticleLoader(this, queryUrl);
     }
 
     /*

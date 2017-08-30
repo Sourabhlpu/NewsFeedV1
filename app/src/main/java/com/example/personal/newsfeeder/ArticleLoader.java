@@ -3,6 +3,11 @@ package com.example.personal.newsfeeder;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
+import com.example.personal.newsfeeder.utilities.NetworkUtils;
+import com.example.personal.newsfeeder.utilities.OpenNewsJsonUtils;
+
+import java.io.IOException;
+import java.net.URL;
 import java.util.List;
 
 /**
@@ -14,7 +19,7 @@ import java.util.List;
 public class ArticleLoader extends AsyncTaskLoader<List<TheArticle>> {
 
     // mURL stores the url for fetching the data.
-    private String mURL;
+    private URL mURL;
     List mArticles;
 
     /*
@@ -22,7 +27,7 @@ public class ArticleLoader extends AsyncTaskLoader<List<TheArticle>> {
      * @param context is the context that's required by the super class
      * @param url is the url that is used to fetch the data
      */
-    public ArticleLoader(Context context,String url)
+    public ArticleLoader(Context context,URL url)
     {
         super(context);
         mURL = url;
@@ -54,7 +59,12 @@ public class ArticleLoader extends AsyncTaskLoader<List<TheArticle>> {
         {
             return null;
         }
-        mArticles = QueryUtils.fetchArticles(mURL);
+
+        try {
+            mArticles = OpenNewsJsonUtils.extractArticles(NetworkUtils.makeHttpRequest(mURL));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         return mArticles;
     }
 
