@@ -45,6 +45,11 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:clipToPadding="false">
 
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/swipeContainer">
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
@@ -52,8 +57,8 @@
             android:layout_marginBottom="8dp"
             android:scrollbars="vertical"
             android:clipToPadding="false"
-
             />
+        </android.support.v4.widget.SwipeRefreshLayout>
 
 
         <TextView

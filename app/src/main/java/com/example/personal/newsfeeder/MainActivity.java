@@ -9,8 +9,10 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private LinearLayoutManager mLayoutManager;
     private TextView mEmptyTextView;
     private EndlessRecyclerViewScrollListener scrollListener;
+    private SwipeRefreshLayout mSwipeContainer;
 
     private  String page = "1";
 
@@ -152,6 +155,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
+        mSwipeContainer = (SwipeRefreshLayout)findViewById(R.id.swipeContainer);
+
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+
+                fetchDataAfterSwipeUp(1);
+
+            }
+        });
+
+        mSwipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
+
+
+
         /*
          * initializing the adapter
          * the first param takes the context of this activity to pass the context
@@ -169,6 +191,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          * Here we initialize the class. We pass in the layoutManager that our recycler uses
          *
          */
+
+
 
         scrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
 
@@ -194,6 +218,25 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         scrollListener.resetState();
 
+
+    }
+
+
+    public void fetchDataAfterSwipeUp(int currentPage)
+    {
+        mAdapter.clear();
+
+        page =  currentPage + "";
+        //Log.v(LOG_TAG,"PAGE VALUE IN THE load.. function " + page);
+        getLoaderManager().destroyLoader(EARTHQUAKE_LOADER_ID);
+        getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, null, this);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeContainer.setRefreshing(false);
+            }
+        }, 5000);
 
     }
 

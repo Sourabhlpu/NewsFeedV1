@@ -375,4 +375,10 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         // holder.mHeartView.setImageResource(mArticles.get(position).getmHeartResourceId());
 
     }
+
+    public void clear()
+    {
+        mArticles.clear();
+        //notifyDataSetChanged();
+    }
 }
