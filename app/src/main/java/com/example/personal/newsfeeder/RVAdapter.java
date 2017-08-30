@@ -293,6 +293,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView mTheTitleView;
         TextView mTheSubtitleView;
         TextView mTheThreeLinesView;
+        ImageView mBookmarkImage;
         Context context;
 
 
@@ -318,6 +319,8 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             ViewStub stub = (ViewStub)itemView.findViewById(R.id.layout_stub);
             stub.setLayoutResource(R.layout.cardview_actions);
             View inflated = stub.inflate();
+
+            mBookmarkImage = (ImageView) stub.findViewById(R.id.bookmark_image);
 
             inflated.findViewById(R.id.bookmark_image).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -373,6 +376,12 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.mTheThreeLinesView.setText(mArticles.get(position).getmTheThreeLines());
         //holder.mBookmarkView.setImageResource(mArticles.get(position).getmBookmarkResourceId());
         // holder.mHeartView.setImageResource(mArticles.get(position).getmHeartResourceId());
-
+       /* String id = mArticles.get(position).getmId();
+        boolean isBookmarked = NewsPreferences.isBookmarked(id,mContext);
+        if(isBookmarked)
+        {
+            holder.mBookmarkImage.setBackgroundResource(R.drawable.bookmark);
+        }
+        */
     }
 }

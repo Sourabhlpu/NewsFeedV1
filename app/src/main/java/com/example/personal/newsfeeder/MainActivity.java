@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.personal.newsfeeder.data.NewsContract;
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 
 import java.net.URL;
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private static boolean isBookmarked = false;
 
 
     private RecyclerView mRecyclerView;
@@ -266,6 +266,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onBookmarkClick(TheArticle article) {
 
+        boolean isBookmarked = NewsPreferences.isBookmarked(article.getmId(),this);
+
         if(!isBookmarked) {
             ContentValues values = new ContentValues();
 
@@ -282,9 +284,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
 
+            NewsPreferences.saveBookmark(article.getmId(),this);
+
             if (insertedUri != null) {
                 Toast.makeText(this, "Bookmarked", Toast.LENGTH_SHORT).show();
             }
+        }
+        else
+        {
+            //delete the bookmark
+            NewsPreferences.removeBookmark(article.getmId(),this);
+            findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
+            Toast.makeText(this,"Bookmark Removed",Toast.LENGTH_SHORT).show();
         }
 
 

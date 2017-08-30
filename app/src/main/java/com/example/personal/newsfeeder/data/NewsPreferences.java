@@ -12,6 +12,8 @@ import com.example.personal.newsfeeder.R;
 
 public class NewsPreferences {
 
+    private static int BookmarkCount;
+
     public static boolean saveBookmarks(String url)
     {
          return true;
@@ -37,5 +39,30 @@ public class NewsPreferences {
 
         String pageSize = sp.getString(pageSizeKey,pageSizeDefault);
         return pageSize;
+    }
+
+    public static boolean isBookmarked(String id, Context context)
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+
+        return sp.contains(id);
+    }
+
+    public static void saveBookmark(String id, Context context)
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        editor.putString(id,id);
+        editor.apply();
+    }
+
+    public static void removeBookmark(String id, Context context)
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sp.edit();
+
+        editor.remove(id);
+        editor.apply();
     }
 }
