@@ -44,6 +44,8 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     final private BookmarkOnClickHandler mOnBookmarkClickHandler;
 
+    final private ShareOnClickHandler mOnShareClickHandler;
+
     // mArticles stores the data that we received from the loaders in the form of list
     List<TheArticle> mArticles;
     Context mContext;
@@ -64,6 +66,10 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void onBookmarkClick(TheArticle article);
     }
+    public interface ShareOnClickHandler
+    {
+        void onShareClick(TheArticle article);
+    }
 
     /*
      * the constructor for the RVAdapter class.
@@ -74,7 +80,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     public RVAdapter(Context context, List<TheArticle> articles, ListItemOnClickHandler onClickHandler
-            ,BookmarkOnClickHandler onBookMarkClickHandler) {
+            ,BookmarkOnClickHandler onBookMarkClickHandler, ShareOnClickHandler onShareClickHandler) {
 
         //the usual initialization of the member variables happening
 
@@ -82,6 +88,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mContext = context;
         mOnClickHandler = onClickHandler;
         mOnBookmarkClickHandler = onBookMarkClickHandler;
+        mOnShareClickHandler = onShareClickHandler;
     }
 
     //this is the necessary override that just gives the size of the list of articles
@@ -296,6 +303,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView mTheSubtitleView;
         TextView mTheThreeLinesView;
         ImageView mBookmarkImage;
+        ImageView mShareIcon;
         Context context;
 
 
@@ -323,12 +331,21 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             View inflated = stub.inflate();
 
             mBookmarkImage = (ImageView) inflated.findViewById(R.id.bookmark_image);
+            mShareIcon = (ImageView) inflated.findViewById(R.id.share_icon);
 
             inflated.findViewById(R.id.bookmark_image).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     mOnBookmarkClickHandler.onBookmarkClick(mArticles.get(position));
+                }
+            });
+
+            inflated.findViewById(R.id.share_icon).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    mOnShareClickHandler.onShareClick(mArticles.get(position));
                 }
             });
         }

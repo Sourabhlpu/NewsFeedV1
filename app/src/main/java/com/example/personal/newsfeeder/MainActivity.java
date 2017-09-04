@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,7 +34,7 @@ import java.util.List;
  * we also implement ListItemOnClickHandler to handle the clicks on the article
 */
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<TheArticle>>,
-        RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler {
+        RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler, RVAdapter.ShareOnClickHandler {
 
     //we give the loader an id. This is just a random unique value.
     private static final int EARTHQUAKE_LOADER_ID = 1;
@@ -160,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          * listItemOnclickHandler abstract class.
          *
          */
-        mAdapter = new RVAdapter(this, new ArrayList<TheArticle>(), this, this);
+        mAdapter = new RVAdapter(this, new ArrayList<TheArticle>(), this, this,this);
         mRecyclerView.setAdapter(mAdapter);
 
         /*
@@ -306,6 +307,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
 
+
+    }
+
+    @Override
+    public void onShareClick(TheArticle article) {
+
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText(article.getmDetailPageLink())
+                .getIntent();
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+
+        startActivity(shareIntent);
 
     }
 }
