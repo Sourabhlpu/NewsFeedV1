@@ -277,6 +277,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             values.put(NewsContract.NewsEntry.TITLE, article.getmTheTitle());
             values.put(NewsContract.NewsEntry.ShortDescription, article.getmTheThreeLines());
             values.put(NewsContract.NewsEntry.DetailPageLink, article.getmDetailPageLink());
+            values.put(NewsContract.NewsEntry.linkId,article.getmId());
 
             Uri insertedUri = this.getContentResolver().insert(NewsContract.NewsEntry.CONTENT_URI, values);
 
@@ -292,10 +293,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
         else
         {
+            String[] selectionArgs = new String[]{article.getmId()};
             //delete the bookmark
-            NewsPreferences.removeBookmark(article.getmId(),this);
-            findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
-            Toast.makeText(this,"Bookmark Removed",Toast.LENGTH_SHORT).show();
+
+            int numOfRowsDeleted = this.getContentResolver().delete(NewsContract.NewsEntry.CONTENT_URI,
+                    NewsContract.NewsEntry.linkId + "=?",selectionArgs);
+            if(numOfRowsDeleted > 0) {
+                NewsPreferences.removeBookmark(article.getmId(),this);
+                findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
+                Toast.makeText(this, "Bookmark Removed", Toast.LENGTH_SHORT).show();
+            }
         }
 
 
