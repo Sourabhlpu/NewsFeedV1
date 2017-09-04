@@ -23,9 +23,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
+            android:theme="@style/ToolbarTheme"
             app:layout_scrollFlags="scroll|enterAlways"
             android:minHeight="?attr/actionBarSize"
-            app:titleTextColor="@android:color/white">
+            app:titleTextColor="@android:color/white"
+            app:popupTheme="@style/StyleForMyOverflowMenu">
 
             <TextView
                 android:layout_width="wrap_content"

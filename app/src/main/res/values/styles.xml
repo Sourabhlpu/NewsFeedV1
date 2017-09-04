@@ -32,4 +32,9 @@
         
     </style>
 
+    <style name="StyleForMyOverflowMenu" parent="ThemeOverlay.AppCompat.Light">
+        <item name="android:colorBackground">@android:color/white</item>
+        <item name="android:textColorSecondary">@android:color/white</item>
+    </style>
+
 </resources>
