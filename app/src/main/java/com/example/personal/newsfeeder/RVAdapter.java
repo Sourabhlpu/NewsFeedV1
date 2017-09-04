@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NewsFeederDateUtils;
 import com.squareup.picasso.Picasso;
 
@@ -320,7 +322,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             stub.setLayoutResource(R.layout.cardview_actions);
             View inflated = stub.inflate();
 
-            mBookmarkImage = (ImageView) stub.findViewById(R.id.bookmark_image);
+            mBookmarkImage = (ImageView) inflated.findViewById(R.id.bookmark_image);
 
             inflated.findViewById(R.id.bookmark_image).setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -376,12 +378,13 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.mTheThreeLinesView.setText(mArticles.get(position).getmTheThreeLines());
         //holder.mBookmarkView.setImageResource(mArticles.get(position).getmBookmarkResourceId());
         // holder.mHeartView.setImageResource(mArticles.get(position).getmHeartResourceId());
-       /* String id = mArticles.get(position).getmId();
+        String id = mArticles.get(position).getmId();
         boolean isBookmarked = NewsPreferences.isBookmarked(id,mContext);
         if(isBookmarked)
         {
+            Log.v(LOG_TAG, "bookmarked articles is true ");
             holder.mBookmarkImage.setBackgroundResource(R.drawable.bookmark);
         }
-        */
+
     }
 }
