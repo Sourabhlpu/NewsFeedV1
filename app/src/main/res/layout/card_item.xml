@@ -62,7 +62,7 @@
                 tools:text="@string/description"
                 android:ellipsize="end"
                 android:lineSpacingMultiplier="1.2"/>
-           
+
          <ViewStub
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
