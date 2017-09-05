@@ -11,14 +11,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -50,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private TextView mEmptyTextView;
     private EndlessRecyclerViewScrollListener scrollListener;
     private SwipeRefreshLayout mSwipeContainer;
+    private DrawerLayout drawerLayout;
+    private NavigationView navigationView;
+    private View content;
 
     private  String page = "1";
 
@@ -218,7 +228,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         scrollListener.resetState();
 
+        content = findViewById(R.id.content);
 
+
+    }
+
+    private void setupDrawerLayout()
+    {
+        drawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView)findViewById(R.id.navigation_view);
+
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem item) {
+                Snackbar.make(content, item.getTitle() + " pressed", Snackbar.LENGTH_LONG).show();
+                item.setChecked(true);
+                drawerLayout.closeDrawers();
+                return true;
+            }
+        });
+
+    }
+
+    private void initToolbar()
+    {
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        final ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
 
@@ -274,6 +315,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        }
+        else if(id == R.id.home)
+        {
+            drawerLayout.openDrawer(GravityCompat.START);
         }
 
         return super.onOptionsItemSelected(item);
