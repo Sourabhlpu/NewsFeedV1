@@ -62,10 +62,12 @@
                 tools:text="@string/description"
                 android:ellipsize="end"
                 android:lineSpacingMultiplier="1.2"/>
+
          <ViewStub
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:id="@+id/layout_stub"
+             android:layout_marginLeft="16dp"
              android:inflatedId="@+id/actions"/>
 
         </LinearLayout>

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NewsFeederDateUtils;
 import com.squareup.picasso.Picasso;
 
@@ -42,6 +44,8 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     final private BookmarkOnClickHandler mOnBookmarkClickHandler;
 
+    final private ShareOnClickHandler mOnShareClickHandler;
+
     // mArticles stores the data that we received from the loaders in the form of list
     List<TheArticle> mArticles;
     Context mContext;
@@ -62,6 +66,10 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
         void onBookmarkClick(TheArticle article);
     }
+    public interface ShareOnClickHandler
+    {
+        void onShareClick(TheArticle article);
+    }
 
     /*
      * the constructor for the RVAdapter class.
@@ -72,7 +80,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
     public RVAdapter(Context context, List<TheArticle> articles, ListItemOnClickHandler onClickHandler
-            ,BookmarkOnClickHandler onBookMarkClickHandler) {
+            ,BookmarkOnClickHandler onBookMarkClickHandler, ShareOnClickHandler onShareClickHandler) {
 
         //the usual initialization of the member variables happening
 
@@ -80,6 +88,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         mContext = context;
         mOnClickHandler = onClickHandler;
         mOnBookmarkClickHandler = onBookMarkClickHandler;
+        mOnShareClickHandler = onShareClickHandler;
     }
 
     //this is the necessary override that just gives the size of the list of articles
@@ -293,6 +302,8 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         TextView mTheTitleView;
         TextView mTheSubtitleView;
         TextView mTheThreeLinesView;
+        ImageView mBookmarkImage;
+        ImageView mShareIcon;
         Context context;
 
 
@@ -319,11 +330,22 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             stub.setLayoutResource(R.layout.cardview_actions);
             View inflated = stub.inflate();
 
+            mBookmarkImage = (ImageView) inflated.findViewById(R.id.bookmark_image);
+            mShareIcon = (ImageView) inflated.findViewById(R.id.share_icon);
+
             inflated.findViewById(R.id.bookmark_image).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
                     mOnBookmarkClickHandler.onBookmarkClick(mArticles.get(position));
+                }
+            });
+
+            inflated.findViewById(R.id.share_icon).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    mOnShareClickHandler.onShareClick(mArticles.get(position));
                 }
             });
         }
@@ -373,6 +395,13 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         holder.mTheThreeLinesView.setText(mArticles.get(position).getmTheThreeLines());
         //holder.mBookmarkView.setImageResource(mArticles.get(position).getmBookmarkResourceId());
         // holder.mHeartView.setImageResource(mArticles.get(position).getmHeartResourceId());
+        String id = mArticles.get(position).getmId();
+        boolean isBookmarked = NewsPreferences.isBookmarked(id,mContext);
+        if(isBookmarked)
+        {
+            Log.v(LOG_TAG, "bookmarked articles is true ");
+            holder.mBookmarkImage.setBackgroundResource(R.drawable.bookmark);
+        }
 
     }
 

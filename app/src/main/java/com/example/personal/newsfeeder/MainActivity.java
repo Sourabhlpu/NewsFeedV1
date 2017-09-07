@@ -11,11 +11,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.customtabs.CustomTabsIntent;
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.personal.newsfeeder.data.NewsContract;
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 
 import java.net.URL;
@@ -34,14 +37,13 @@ import java.util.List;
  * we also implement ListItemOnClickHandler to handle the clicks on the article
 */
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<TheArticle>>,
-        RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler {
+        RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler, RVAdapter.ShareOnClickHandler {
 
     //we give the loader an id. This is just a random unique value.
     private static final int EARTHQUAKE_LOADER_ID = 1;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private static boolean isBookmarked = false;
 
 
     private RecyclerView mRecyclerView;
@@ -182,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          * listItemOnclickHandler abstract class.
          *
          */
-        mAdapter = new RVAdapter(this, new ArrayList<TheArticle>(), this, this);
+        mAdapter = new RVAdapter(this, new ArrayList<TheArticle>(), this, this,this);
         mRecyclerView.setAdapter(mAdapter);
 
         /*
@@ -217,6 +219,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mRecyclerView.addOnScrollListener(scrollListener);
 
         scrollListener.resetState();
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+
+        setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
 
     }
@@ -309,6 +317,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onBookmarkClick(TheArticle article) {
 
+        boolean isBookmarked = NewsPreferences.isBookmarked(article.getmId(),this);
+
         if(!isBookmarked) {
             ContentValues values = new ContentValues();
 
@@ -318,6 +328,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             values.put(NewsContract.NewsEntry.TITLE, article.getmTheTitle());
             values.put(NewsContract.NewsEntry.ShortDescription, article.getmTheThreeLines());
             values.put(NewsContract.NewsEntry.DetailPageLink, article.getmDetailPageLink());
+            values.put(NewsContract.NewsEntry.linkId,article.getmId());
 
             Uri insertedUri = this.getContentResolver().insert(NewsContract.NewsEntry.CONTENT_URI, values);
 
@@ -325,12 +336,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
 
+            NewsPreferences.saveBookmark(article.getmId(),this);
+
             if (insertedUri != null) {
                 Toast.makeText(this, "Bookmarked", Toast.LENGTH_SHORT).show();
             }
         }
+        else
+        {
+            String[] selectionArgs = new String[]{article.getmId()};
+            //delete the bookmark
+
+            int numOfRowsDeleted = this.getContentResolver().delete(NewsContract.NewsEntry.CONTENT_URI,
+                    NewsContract.NewsEntry.linkId + "=?",selectionArgs);
+            if(numOfRowsDeleted > 0) {
+                NewsPreferences.removeBookmark(article.getmId(),this);
+                findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
+                Toast.makeText(this, "Bookmark Removed", Toast.LENGTH_SHORT).show();
+            }
+        }
 
 
+
+    }
+
+    @Override
+    public void onShareClick(TheArticle article) {
+
+        Intent shareIntent = ShareCompat.IntentBuilder.from(this)
+                .setType("text/plain")
+                .setText(article.getmDetailPageLink())
+                .getIntent();
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
+
+        startActivity(shareIntent);
 
     }
 }

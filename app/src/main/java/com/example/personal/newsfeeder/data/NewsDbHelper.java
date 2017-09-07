@@ -34,6 +34,7 @@ public class NewsDbHelper extends SQLiteOpenHelper {
                         NewsEntry.DetailPageLink + " STRING NOT NULL, " +
                         NewsEntry.TITLE + " STRING NOT NULL, " +
                         NewsEntry.COLUMN_DATE + " STRING NOT NULL, " +
+                        NewsEntry.linkId + " STRING NOT NULL, " +
                         " UNIQUE (" + NewsEntry.COLUMN_DATE + ") ON CONFLICT REPLACE);";
 
         db.execSQL(SQL_CREATE_NEWS_TABLE);

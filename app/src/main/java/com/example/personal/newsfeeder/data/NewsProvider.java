@@ -87,7 +87,33 @@ public class NewsProvider extends ContentProvider {
 
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        int match = sUriMatcher.match(uri);
+
+        int numOfRowsDeleted;
+
+        if(selection == null) selection = "1";
+
+        switch (match)
+        {
+            case CODE_NEWS:
+
+                numOfRowsDeleted = db.delete(
+                        NewsContract.NewsEntry.TABLE_NAME,
+                        selection,
+                        selectionArgs
+                );
+                break;
+            default:
+                throw new UnsupportedOperationException("Uknown uri " + uri);
+
+        }
+        if(numOfRowsDeleted != 0)
+        {
+            getContext().getContentResolver().notifyChange(uri,null);
+        }
+        return numOfRowsDeleted;
     }
 
     @Override

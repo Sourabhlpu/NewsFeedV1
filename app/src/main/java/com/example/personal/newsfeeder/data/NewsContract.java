@@ -34,5 +34,7 @@ public class NewsContract {
         public static final String ShortDescription = "description";
 
         public static final String DetailPageLink = "pageLink";
+
+        public static final String linkId = "id";
     }
 }
