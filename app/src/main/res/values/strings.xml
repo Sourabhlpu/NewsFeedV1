@@ -65,6 +65,12 @@
 
     <string name="content_authority">com.example.android.newsfeeder</string>
 
+    <!-- Strings for the menu and headers of the navigation drawer !-->
 
+    <string name="home">Home</string>
+    <string name="favourite">Favourite</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="more">More</string>
+    <string name="settings">settings</string>
 
 </resources>
