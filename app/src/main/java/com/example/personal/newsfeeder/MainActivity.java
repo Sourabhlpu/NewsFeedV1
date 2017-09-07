@@ -230,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         content = findViewById(R.id.content);
 
+        initToolbar();
+        setupDrawerLayout();
+
 
     }
 
@@ -252,12 +255,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void initToolbar()
     {
-        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
         final ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
 
         if (actionBar != null) {
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -309,20 +313,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
 
-        if (id == R.id.settings) {
-            Intent intent = new Intent(this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        else if(id == R.id.home)
-        {
-            drawerLayout.openDrawer(GravityCompat.START);
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            case R.id.settings:
+                Intent intent = new Intent(this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
+
+        }
+
 
     /*
     * this is the method that main activity overrides to implement onClick
