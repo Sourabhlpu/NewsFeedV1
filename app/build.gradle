@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.1'
     defaultConfig {
         applicationId "com.example.personal.newsfeeder"
         minSdkVersion 16
@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        resConfigs "auto"
     }
     buildTypes {
         release {
@@ -35,8 +36,8 @@ dependencies {
     compile 'com.android.support:customtabs:24.0.0'
 
     //firebase dependencies
-    compile 'com.google.firebase:firebase-auth:11.4.2'
-    compile 'com.firebaseui:firebase-ui-auth:3.0.0'
+    compile 'com.google.firebase:firebase-auth:9.6.1'
+    compile 'com.firebaseui:firebase-ui-auth:0.6.0'
 
 
     testCompile 'junit:junit:4.12'

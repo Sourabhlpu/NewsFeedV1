@@ -10,13 +10,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsIntent;
-
-import android.support.v4.app.ShareCompat;
-
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-
+import android.support.v4.app.ShareCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -36,10 +34,15 @@ import android.widget.Toast;
 import com.example.personal.newsfeeder.data.NewsContract;
 import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
+import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+
 
 /*
  * The main activity implements the LoaderManager to handle all the loading of data off the main thread
@@ -50,6 +53,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     //we give the loader an id. This is just a random unique value.
     private static final int EARTHQUAKE_LOADER_ID = 1;
+
+    //constant for the start activity for result method for user signin
+    private static final int RC_SIGN_IN = 2;
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
@@ -64,6 +70,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
     private View content;
+
+    //Firebase
+    private FirebaseAuth mFirebaseAuth;
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
 
     private  String page = "1";
 
@@ -135,6 +146,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_view);
+
+        //initializing the firebase auth variable
+        mFirebaseAuth = FirebaseAuth.getInstance();
 
         //mEmptyTextView is used to display an error message when we cannot load the data
         mEmptyTextView = (TextView) findViewById(R.id.empty_text_view);
@@ -239,6 +253,32 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         initToolbar();
         setupDrawerLayout();
+
+        mAuthStateListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                if(user != null)
+                {
+                    //user is signed in
+                    Toast.makeText(MainActivity.this,"You are signed in", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    //user is signed out
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                            .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                            .setProviders(
+                                    AuthUI.GOOGLE_PROVIDER,
+                                    AuthUI.EMAIL_PROVIDER)
+                            .build(),
+                            RC_SIGN_IN);
+                }
+
+            }
+        };
 
 
     }
@@ -420,5 +460,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         startActivity(shareIntent);
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
 }
