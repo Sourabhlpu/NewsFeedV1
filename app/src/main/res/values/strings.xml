@@ -72,5 +72,6 @@
     <string name="downloaded">Downloaded</string>
     <string name="more">More</string>
     <string name="settings">settings</string>
+    <string name="signout">Sign Out</string>
 
 </resources>

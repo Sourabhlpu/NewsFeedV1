@@ -37,6 +37,8 @@ import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -74,6 +76,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //Firebase
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
 
 
     private  String page = "1";
@@ -149,6 +153,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //initializing the firebase auth variable
         mFirebaseAuth = FirebaseAuth.getInstance();
+
+        //initializing the firebase realtime database
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("users");
 
         //mEmptyTextView is used to display an error message when we cannot load the data
         mEmptyTextView = (TextView) findViewById(R.id.empty_text_view);
@@ -263,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 {
                     //user is signed in
                     Toast.makeText(MainActivity.this,"You are signed in", Toast.LENGTH_SHORT).show();
+                    mDatabaseReference.child(user.getUid()).child("name").setValue(user.getDisplayName());
+                    mDatabaseReference.child(user.getUid()).child("email").setValue(user.getEmail());
                 }
                 else {
                     //user is signed out
@@ -369,6 +379,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Intent intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 return true;
+            case R.id.signout:
+                AuthUI.getInstance().signOut(this);
         }
 
         return super.onOptionsItemSelected(item);
