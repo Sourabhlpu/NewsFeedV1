@@ -2,7 +2,6 @@ package com.example.personal.newsfeeder;
 
 
 import android.app.LoaderManager;
-import android.content.ContentValues;
 import android.content.Intent;
 import android.content.Loader;
 import android.net.ConnectivityManager;
@@ -31,8 +30,6 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.personal.newsfeeder.data.NewsContract;
-import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -273,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     Toast.makeText(MainActivity.this,"You are signed in", Toast.LENGTH_SHORT).show();
                     mDatabaseReference.child(user.getUid()).child("name").setValue(user.getDisplayName());
                     mDatabaseReference.child(user.getUid()).child("email").setValue(user.getEmail());
+                    //mDatabaseReference.child(user.getUid()).child("bookmarks").push();
                 }
                 else {
                     //user is signed out
@@ -418,7 +416,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onBookmarkClick(TheArticle article) {
 
-        boolean isBookmarked = NewsPreferences.isBookmarked(article.getmId(),this);
+       /* boolean isBookmarked = NewsPreferences.isBookmarked(article.getmId(),this);
 
         if(!isBookmarked) {
             ContentValues values = new ContentValues();
@@ -457,7 +455,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         }
 
+       */
+      mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
 
+              .child("bookmarks")
+              .push()
+              .setValue(article);
 
     }
 
