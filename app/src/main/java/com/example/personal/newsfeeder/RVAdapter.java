@@ -230,6 +230,16 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     }
 
+    public void replaceAll(List<TheArticle> articles)
+    {
+        if(mArticles != null)
+        {
+            mArticles.clear();
+            mArticles.addAll(articles);
+            notifyDataSetChanged();
+        }
+    }
+
     /*
      * view holder class is responsible for doing the expensive findViewById task which is done once and that's it.
      * this view holder is for the horizontal scrolling list. So here we do the normal procedure that we do

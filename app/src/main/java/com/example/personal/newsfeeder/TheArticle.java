@@ -17,6 +17,11 @@ public class TheArticle {
     private int mHeartResourceId;
     private String mDetailPageLink;
 
+    public TheArticle()
+    {
+
+    }
+
     public TheArticle(String avatarName, String date, String imageURL,
                       String theTitle, String theThreeLines, int bookmarkResourceId,
                       int heartResourceId, String detailPageLink, String id) {
@@ -87,5 +92,10 @@ public class TheArticle {
 
     {
         return mId;
+    }
+
+    @Override
+    public String toString() {
+        return this.getmTheTitle();
     }
 }

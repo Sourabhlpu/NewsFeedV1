@@ -1,9 +1,7 @@
 package com.example.personal.newsfeeder.utilities;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.personal.newsfeeder.data.NewsPreferences;
@@ -46,7 +44,7 @@ public class NetworkUtils {
         Log.v(LOG_TAG, "The value of the page index " + currentPage);
 
         //we fetch the settings the user has set to fetch the data in the settings activity.
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+
 
         //we want to get the value of the user preference of the sort order of the articles
         String orderBy = NewsPreferences.getOrderBy(context);
