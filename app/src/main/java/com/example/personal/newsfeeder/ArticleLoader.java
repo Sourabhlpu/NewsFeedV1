@@ -1,7 +1,8 @@
 package com.example.personal.newsfeeder;
 
-import android.content.AsyncTaskLoader;
+
 import android.content.Context;
+import android.support.v4.content.AsyncTaskLoader;
 
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.example.personal.newsfeeder.utilities.OpenNewsJsonUtils;
