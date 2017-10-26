@@ -48,8 +48,10 @@ public class MainActivity extends AppCompatActivity  {
 
     private ArrayList<TheArticle> mBookmarks;
 
+    public interface Bookmarks {
 
-    private  String page = "1";
+        void passBookmarkObjects(ArrayList<TheArticle> articles);
+    }
 
 
 
@@ -79,6 +81,19 @@ public class MainActivity extends AppCompatActivity  {
 
         setupDrawerLayout(navigationView);
 
+        Class fragmentClass = MainActivityFragment.class;
+        Fragment fragment = null;
+
+        try{
+            fragment = (Fragment)fragmentClass.newInstance();
+        }catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.flContent,fragment).commit();
+
     }
 
     private void setupDrawerLayout(NavigationView navigationView)
@@ -106,7 +121,7 @@ public class MainActivity extends AppCompatActivity  {
                 fragmentClass = MainActivityFragment.class;
                 break;
             case R.id.drawer_favourite :
-                fragmentClass = BookmarkFragment.class;
+                fragmentClass = .class;
                 break;
             default:
                 fragmentClass = MainActivityFragment.class;
