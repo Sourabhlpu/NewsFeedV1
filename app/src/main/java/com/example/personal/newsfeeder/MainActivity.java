@@ -11,14 +11,18 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -40,20 +44,21 @@ public class MainActivity extends AppCompatActivity  {
     private NavigationView navigationView;
     private View content;
 
+
     //Firebase
     private FirebaseAuth mFirebaseAuth;
-    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
     private FirebaseDatabase mFirebaseDatabase;
     private DatabaseReference mDatabaseReference;
 
     private ArrayList<TheArticle> mBookmarks;
 
-    public interface Bookmarks {
 
-        void passBookmarkObjects(ArrayList<TheArticle> articles);
+
+    public ArrayList<TheArticle> getmBookmarks()
+    {
+        return mBookmarks;
     }
-
-
 
 
 
@@ -67,6 +72,9 @@ public class MainActivity extends AppCompatActivity  {
 
         mBookmarks = new ArrayList<TheArticle>();
 
+
+        //initializing the firebase auth variable
+        mFirebaseAuth = FirebaseAuth.getInstance();
         //initializing the firebase realtime database
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
@@ -121,7 +129,26 @@ public class MainActivity extends AppCompatActivity  {
                 fragmentClass = MainActivityFragment.class;
                 break;
             case R.id.drawer_favourite :
-                fragmentClass = .class;
+                fragmentClass = BookmarkFragment.class;
+                mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                        .child("bookmarks")
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for(DataSnapshot bookmarkSnapshot : dataSnapshot.getChildren())
+                                {
+                                    TheArticle bookmark = bookmarkSnapshot.getValue(TheArticle.class);
+                                    mBookmarks.add(bookmark);
+                                    //mAdapter.replaceAll(mBookmarks);
+                                    Log.v(LOG_TAG, "the retrieved bookmark object is " + bookmark);
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                 break;
             default:
                 fragmentClass = MainActivityFragment.class;
