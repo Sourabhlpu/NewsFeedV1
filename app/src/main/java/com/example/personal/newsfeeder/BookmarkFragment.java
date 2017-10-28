@@ -24,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * Created by personal on 10/23/2017.
@@ -48,6 +49,7 @@ public class BookmarkFragment extends Fragment {
     private EndlessRecyclerViewScrollListener scrollListener;
     private SwipeRefreshLayout mSwipeContainer;
     private ProgressBar mProgressbar;
+
 
     @Nullable
     @Override
@@ -95,18 +97,24 @@ public class BookmarkFragment extends Fragment {
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        for(DataSnapshot bookmarkSnapshot : dataSnapshot.getChildren())
-                        {
-                            TheArticle bookmark = bookmarkSnapshot.getValue(TheArticle.class);
-                            mBookmarks.add(bookmark);
-                            //mAdapter.replaceAll(mBookmarks);
-                            Log.v(LOG_TAG, "the retrieved bookmark object is " + bookmark);
+
+                        if (!dataSnapshot.hasChildren()) {
+                            mEmptyTextView.setText("No Bookmarks");
+                        } else {
+
+                            for (DataSnapshot bookmarkSnapshot : dataSnapshot.getChildren()) {
+                                TheArticle bookmark = bookmarkSnapshot.getValue(TheArticle.class);
+                                mBookmarks.add(bookmark);
+                                //mAdapter.replaceAll(mBookmarks);
+                                Log.v(LOG_TAG, "the retrieved bookmark object is " + bookmark);
+                            }
+
+                            Log.v(LOG_TAG, "the bookmark collection is " + mBookmarks);
+                            Collections.reverse(mBookmarks);
+                            mAdapter.updateDataset(mBookmarks);
+                            mProgressbar.setVisibility(View.INVISIBLE);
+
                         }
-
-                        Log.v(LOG_TAG,"the bookmark collection is " + mBookmarks);
-                        mAdapter.updateDataset(mBookmarks);
-                        mProgressbar.setVisibility(View.INVISIBLE);
-
                     }
 
                     @Override
