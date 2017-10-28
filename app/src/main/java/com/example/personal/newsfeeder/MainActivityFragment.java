@@ -349,6 +349,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                 .push()
                 .setValue(article);
 
+        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("bookmarkIds")
+                .push()
+                .setValue(article.getmId());
+
     }
 
     @Override
