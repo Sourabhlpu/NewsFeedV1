@@ -122,7 +122,13 @@ public class BookmarkAdapter extends RecyclerView.Adapter<BookmarkAdapter.Bookma
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mBookmark.size();
+    }
+
+    public void updateDataset(List<TheArticle> bookmarks)
+    {
+        mBookmark = bookmarks;
+        notifyDataSetChanged();
     }
 
 

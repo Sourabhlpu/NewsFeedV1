@@ -13,7 +13,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -27,7 +35,11 @@ public class BookmarkFragment extends Fragment {
 
     private ArrayList<TheArticle> mBookmarks;
 
+    //Firebase
+    private FirebaseAuth mFirebaseAuth;
 
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
 
     private RecyclerView mRecyclerView;
     private BookmarkAdapter mAdapter;
@@ -35,16 +47,25 @@ public class BookmarkFragment extends Fragment {
     private TextView mEmptyTextView;
     private EndlessRecyclerViewScrollListener scrollListener;
     private SwipeRefreshLayout mSwipeContainer;
+    private ProgressBar mProgressbar;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.main_activity_fragment,container,false);
 
+        //initializing the firebase auth variable
+        mFirebaseAuth = FirebaseAuth.getInstance();
+        //initializing the firebase realtime database
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+        mDatabaseReference = mFirebaseDatabase.getReference().child("users");
 
-        mBookmarks = ((MainActivity)getActivity()).getmBookmarks();
 
-        Log.v(LOG_TAG, "The bookmark object is " + mBookmarks);
+        //mBookmarks = ((MainActivity)getActivity()).getmBookmarks();
+        mBookmarks = new ArrayList<TheArticle>();
+
+        //
+        mProgressbar = (ProgressBar)rootView.findViewById(R.id.progress_bar);
 
         //mEmptyTextView is used to display an error message when we cannot load the data
         mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_text_view);
@@ -69,6 +90,31 @@ public class BookmarkFragment extends Fragment {
             mEmptyTextView.setText("No internet connection");
         }
 
+        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("bookmarks")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for(DataSnapshot bookmarkSnapshot : dataSnapshot.getChildren())
+                        {
+                            TheArticle bookmark = bookmarkSnapshot.getValue(TheArticle.class);
+                            mBookmarks.add(bookmark);
+                            //mAdapter.replaceAll(mBookmarks);
+                            Log.v(LOG_TAG, "the retrieved bookmark object is " + bookmark);
+                        }
+
+                        Log.v(LOG_TAG,"the bookmark collection is " + mBookmarks);
+                        mAdapter.updateDataset(mBookmarks);
+                        mProgressbar.setVisibility(View.INVISIBLE);
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
 
         mRecyclerView.setHasFixedSize(true);
 
@@ -78,7 +124,7 @@ public class BookmarkFragment extends Fragment {
         mLayoutManager = new LinearLayoutManager(getContext());
 
         mRecyclerView.setLayoutManager(mLayoutManager);
-
+        Log.v(LOG_TAG, "The bookmark object is " + mBookmarks);
         mAdapter = new BookmarkAdapter(getActivity(),mBookmarks);
         mRecyclerView.setAdapter(mAdapter);
 
