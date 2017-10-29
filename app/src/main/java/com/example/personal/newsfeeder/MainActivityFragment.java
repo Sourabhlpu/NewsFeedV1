@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -67,6 +68,8 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     private DatabaseReference mDatabaseReference;
 
     private ArrayList<TheArticle> mBookmarks;
+
+    //private HashMap<String, String> mBookmarkIds;
 
 
     private  String page = "1";
@@ -145,9 +148,30 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
         mBookmarks = new ArrayList<TheArticle>();
 
+        //mBookmarkIds = new HashMap<>();
+
         //initializing the firebase realtime database
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
+
+        /*mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("bookmarkIds").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
+                {
+                    mBookmarkIds.put(bookmarkIdSnapshot.getValue().toString(), bookmarkIdSnapshot.getKey());
+                }
+
+                Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
+                NewsPreferences.setmBookmarkIds(mBookmarkIds);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
 
         //mEmptyTextView is used to display an error message when we cannot load the data
         mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_text_view);
@@ -182,22 +206,6 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mSwipeContainer = (SwipeRefreshLayout)rootView.findViewById(R.id.swipeContainer);
-
-        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-
-                fetchDataAfterSwipeUp(1);
-
-            }
-        });
-
-        mSwipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
-                android.R.color.holo_green_light,
-                android.R.color.holo_orange_light,
-                android.R.color.holo_red_light);
-
 
 
 
@@ -209,8 +217,12 @@ public class MainActivityFragment extends Fragment implements android.support.v4
          * listItemOnclickHandler abstract class.
          *
          */
-        mAdapter = new RVAdapter(getContext(), new ArrayList<TheArticle>(), this, this,this);
-        mRecyclerView.setAdapter(mAdapter);
+
+
+                mAdapter = new RVAdapter(getContext(), new ArrayList<TheArticle>(), this, this,this);
+                mRecyclerView.setAdapter(mAdapter);
+
+
 
         /*
          * EndlessRecyclerViewScrollListener class is an abstract class that extends RecyclerView's
@@ -303,9 +315,9 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     @Override
     public void onBookmarkClick(TheArticle article) {
 
-       /* boolean isBookmarked = NewsPreferences.isBookmarked(article.getmId(),this);
+       boolean isBookmarked = NewsPreferences.getmBookmarkIds().containsKey(article.getmId());
 
-        if(!isBookmarked) {
+        /* if(!isBookmarked) {
             ContentValues values = new ContentValues();
 
             values.put(NewsContract.NewsEntry.COLUMN_NAME, article.getmAvatarName());
@@ -343,16 +355,34 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         }
 
        */
-        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
 
-                .child("bookmarks")
-                .push()
-                .setValue(article);
+        if(!isBookmarked) {
+            mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
 
-        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
-                .child("bookmarkIds")
-                .push()
-                .setValue(article.getmId());
+                    .child("bookmarks")
+                    .push()
+                    .setValue(article);
+
+            mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                    .child("bookmarkIds")
+                    .push()
+                    .setValue(article.getmId());
+
+            Toast.makeText(getContext(), "Bookmarked", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+           mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                   .child("bookmarkIds")
+                   .child(NewsPreferences.getmBookmarkIds().get(article.getmId()))
+                   .removeValue();
+            NewsPreferences.getmBookmarkIds().remove(article.getmId());
+
+            getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
+
+            Toast.makeText(getContext(), "Bookmark removed", Toast.LENGTH_SHORT).show();
+
+        }
 
     }
 

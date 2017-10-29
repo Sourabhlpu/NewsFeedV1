@@ -406,7 +406,8 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         //holder.mBookmarkView.setImageResource(mArticles.get(position).getmBookmarkResourceId());
         // holder.mHeartView.setImageResource(mArticles.get(position).getmHeartResourceId());
         String id = mArticles.get(position).getmId();
-        boolean isBookmarked = NewsPreferences.isBookmarked(id,mContext);
+        boolean isBookmarked = NewsPreferences.getmBookmarkIds()
+                .containsKey(mArticles.get(position).getmId());
         if(isBookmarked)
         {
             Log.v(LOG_TAG, "bookmarked articles is true ");

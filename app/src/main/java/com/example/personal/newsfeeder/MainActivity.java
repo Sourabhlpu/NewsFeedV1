@@ -11,16 +11,22 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /*
@@ -49,6 +55,8 @@ public class MainActivity extends AppCompatActivity  {
 
     private ArrayList<TheArticle> mBookmarks;
 
+    private HashMap<String, String> mBookmarkIds;
+
 
 
     public ArrayList<TheArticle> getmBookmarks()
@@ -68,6 +76,8 @@ public class MainActivity extends AppCompatActivity  {
 
         mBookmarks = new ArrayList<TheArticle>();
 
+        mBookmarkIds = new HashMap<>();
+
 
         //initializing the firebase auth variable
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -76,6 +86,28 @@ public class MainActivity extends AppCompatActivity  {
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
 
         content = findViewById(R.id.content);
+
+        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("bookmarkIds").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
+                {
+                    mBookmarkIds.put(bookmarkIdSnapshot.getValue().toString(), bookmarkIdSnapshot.getKey());
+                }
+
+                Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
+                NewsPreferences.setmBookmarkIds(mBookmarkIds);
+
+                Log.v(LOG_TAG, "the bookmark ids in the hashmap are " + NewsPreferences.getmBookmarkIds());
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
         initToolbar();
 

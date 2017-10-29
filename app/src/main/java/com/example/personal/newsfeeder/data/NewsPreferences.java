@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 
 import com.example.personal.newsfeeder.R;
 
+import java.util.HashMap;
+
 /**
  * Created by personal on 8/29/2017.
  */
@@ -13,6 +15,18 @@ import com.example.personal.newsfeeder.R;
 public class NewsPreferences {
 
     private static int BookmarkCount;
+
+    private static HashMap<String, String> mBookmarkIds;
+
+    public static HashMap<String, String> getmBookmarkIds()
+    {
+        return mBookmarkIds;
+    }
+
+    public static void setmBookmarkIds(HashMap<String,String> bookmarkIds)
+    {
+        mBookmarkIds = bookmarkIds;
+    }
 
     public static boolean saveBookmarks(String url)
     {
