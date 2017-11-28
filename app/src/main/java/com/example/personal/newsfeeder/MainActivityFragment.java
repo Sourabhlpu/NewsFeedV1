@@ -79,13 +79,12 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
     private  String page = "1";
 
-    /*
-      * this method will build our string to query for the right data
-      * it will return the query String.
-      * @param currentPage is passed in which is the page #.
-     */
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
+    }
 
     //Overriding the three loader methods
 
@@ -94,12 +93,6 @@ public class MainActivityFragment extends Fragment implements android.support.v4
      * it uses the createAPIQueryString to create a query for the api
      * the it passes that string with the context to the ArticleLoader object
      */
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-    }
 
     @Override
     public android.support.v4.content.Loader<List<TheArticle>> onCreateLoader(int id, Bundle args) {
@@ -157,13 +150,25 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         //initializing the firebase auth variable
         mFirebaseAuth = FirebaseAuth.getInstance();
 
+
+       // this stores all the bookmars that are stored in the firebase
         mBookmarks = new ArrayList<TheArticle>();
 
+        //there is a bookmard id's for each bookmark stored on firebase. We store it there
         mBookmarkIds = new HashMap<>();
 
         //initializing the firebase realtime database
         mFirebaseDatabase = FirebaseDatabase.getInstance();
+        //get a reference to users object in firebase database
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
+
+        /*
+         * we want to read all the bookmardIds that are stored in the firebase database.
+         * we want to save all those ids in a hashmap
+         * after its savend in the hashmap we want to save that hashmap in the shared preferences
+         * so that when the recyclerview creates the list items it automatically displays all the
+         * items that were bookmarked already.
+         */
 
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
@@ -187,7 +192,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
         mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
                 .child("bookmarkIds")
-                .addValueEventListener(valueEventListener);
+                .addListenerForSingleValueEvent(valueEventListener);
 
 
 

@@ -16,49 +16,21 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.firebase.ui.auth.AuthUI;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 
 /*
  * The main activity implements the LoaderManager to handle all the loading of data off the main thread
  * we also implement ListItemOnClickHandler to handle the clicks on the article
 */
-public class MainActivity extends AppCompatActivity  {
-
+public class MainActivity extends AppCompatActivity {
 
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
 
-
-
     private DrawerLayout mDrawer;
     private NavigationView navigationView;
     private View content;
-
-
-    //Firebase
-    private FirebaseAuth mFirebaseAuth;
-
-    private FirebaseDatabase mFirebaseDatabase;
-    private DatabaseReference mDatabaseReference;
-
-    private ArrayList<TheArticle> mBookmarks;
-
-    private HashMap<String, String> mBookmarkIds;
-
-
-
-    public ArrayList<TheArticle> getmBookmarks()
-    {
-        return mBookmarks;
-    }
-
 
 
 
@@ -67,50 +39,57 @@ public class MainActivity extends AppCompatActivity  {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recycler_view);
 
-
-
-        mBookmarks = new ArrayList<TheArticle>();
-
-        mBookmarkIds = new HashMap<>();
-
-
-        //initializing the firebase auth variable
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        //initializing the firebase realtime database
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mDatabaseReference = mFirebaseDatabase.getReference().child("users");
-
         content = findViewById(R.id.content);
 
-
-
+        //this function sets up the toolbar
         initToolbar();
 
-        navigationView = (NavigationView)findViewById(R.id.navigation_view);
+        navigationView = (NavigationView) findViewById(R.id.navigation_view);
 
-        mDrawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+        //function to setup the drawer layout.
         setupDrawerLayout(navigationView);
 
+        /*
+         * The main content where the cardview's are displayed is a fragment.
+         * Based on what is selected from the navigation drawer the fragment is replaced.
+         * By default the news articles list is displayed. That is done in the below code.
+         */
+
+        //getting a class object of the MainActivityFragment class.
         Class fragmentClass = MainActivityFragment.class;
+
+        //initializing the fragment to null
         Fragment fragment = null;
 
-        try{
-            fragment = (Fragment)fragmentClass.newInstance();
-        }catch (Exception e)
-        {
+        try {
+            //initializing the fragment to the fragment class i.e. MainActivityFragment class.
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+        //the usual stuff goes here. Getting the fragment manager.
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent,fragment).commit();
+
+        //replacing the main content view with the above fragment.
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
 
     }
 
-    private void setupDrawerLayout(NavigationView navigationView)
-    {
+
+    /*
+     * this function here sets listeners on the navigation view's items.
+     * As any of the items in the navigation is selected this functions is called
+     * The call lands up in onNavigationItemSelected which in turn calls selectDrawerItem()
+     */
+
+    private void setupDrawerLayout(NavigationView navigationView) {
+
+        //setup listener on the navigationView
         navigationView.setNavigationItemSelectedListener(
-                new NavigationView.OnNavigationItemSelectedListener(){
+                new NavigationView.OnNavigationItemSelectedListener() {
 
                     @Override
                     public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -122,17 +101,25 @@ public class MainActivity extends AppCompatActivity  {
         );
     }
 
-    private void selectDrawerItem(MenuItem menuItem)
-    {
+    /*
+     * this method replaces the main content view with the appropriate fragment depending on the
+     * navigation item selected.
+     */
+
+    private void selectDrawerItem(MenuItem menuItem) {
+
+        //initializing the fragment to null
         Fragment fragment = null;
+
+        //creating a class object
         Class fragmentClass;
-        switch (menuItem.getItemId())
-        {
-            case R.id.drawer_home :
+
+        //using switch cases to find which item was selected and initializing the fragment class accordingly
+        switch (menuItem.getItemId()) {
+            case R.id.drawer_home:
                 fragmentClass = MainActivityFragment.class;
                 break;
-            case R.id.drawer_favourite :
-
+            case R.id.drawer_favourite:
 
 
                 fragmentClass = BookmarkFragment.class;
@@ -142,15 +129,19 @@ public class MainActivity extends AppCompatActivity  {
 
         }
 
-        try{
-            fragment = (Fragment)fragmentClass.newInstance();
-        }catch(Exception e)
-        {
+        //initializing the fragment
+        try {
+            fragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+        //now here just replacing the fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.flContent,fragment).commit();
+        fragmentManager.beginTransaction().replace(R.id.flContent, fragment).commit();
+
+
+        //after the item is selected
 
         menuItem.setChecked(true);
 
@@ -197,15 +188,22 @@ public class MainActivity extends AppCompatActivity  {
 
     }*/
 
-    private void initToolbar()
-    {
+    private void initToolbar() {
+        //find the toolbar in the recycler_view.xml file.
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        //set that toolbar as action bar
         setSupportActionBar(toolbar);
+
+        //removing the defauld title of the action bar
         final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowTitleEnabled(false);
 
         if (actionBar != null) {
+
+            //enabling the hamburger icon to be displayed
             actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_white_24dp);
+
+            //make home return up to the next level in the UI rather than the top level.
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
@@ -242,6 +240,6 @@ public class MainActivity extends AppCompatActivity  {
 
         return super.onOptionsItemSelected(item);
 
-        }
+    }
 
 }
