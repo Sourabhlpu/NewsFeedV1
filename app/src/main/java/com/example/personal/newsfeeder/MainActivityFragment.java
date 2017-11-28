@@ -1,6 +1,7 @@
 package com.example.personal.newsfeeder;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -29,11 +30,15 @@ import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -69,7 +74,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
     private ArrayList<TheArticle> mBookmarks;
 
-    //private HashMap<String, String> mBookmarkIds;
+    private HashMap<String, String> mBookmarkIds;
 
 
     private  String page = "1";
@@ -89,6 +94,12 @@ public class MainActivityFragment extends Fragment implements android.support.v4
      * it uses the createAPIQueryString to create a query for the api
      * the it passes that string with the context to the ArticleLoader object
      */
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+    }
 
     @Override
     public android.support.v4.content.Loader<List<TheArticle>> onCreateLoader(int id, Bundle args) {
@@ -148,16 +159,16 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
         mBookmarks = new ArrayList<TheArticle>();
 
-        //mBookmarkIds = new HashMap<>();
+        mBookmarkIds = new HashMap<>();
 
         //initializing the firebase realtime database
         mFirebaseDatabase = FirebaseDatabase.getInstance();
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
 
-        /*mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
-                .child("bookmarkIds").addListenerForSingleValueEvent(new ValueEventListener() {
+        ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
                 {
                     mBookmarkIds.put(bookmarkIdSnapshot.getValue().toString(), bookmarkIdSnapshot.getKey());
@@ -165,13 +176,20 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
                 Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
                 NewsPreferences.setmBookmarkIds(mBookmarkIds);
+
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
             }
-        });*/
+        };
+
+        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("bookmarkIds")
+                .addValueEventListener(valueEventListener);
+
+
 
         //mEmptyTextView is used to display an error message when we cannot load the data
         mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_text_view);
