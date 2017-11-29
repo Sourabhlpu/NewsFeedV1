@@ -16,7 +16,7 @@ public class NewsPreferences {
 
     private static int BookmarkCount;
 
-    private static HashMap<String, String> mBookmarkIds = new HashMap<>();
+    private static HashMap<String, String> mBookmarkIds;
 
     public static HashMap<String, String> getmBookmarkIds()
     {
@@ -25,7 +25,7 @@ public class NewsPreferences {
 
     public static void setmBookmarkIds(HashMap<String,String> bookmarkIds)
     {
-        mBookmarkIds.putAll(mBookmarkIds);
+        mBookmarkIds = bookmarkIds;
     }
 
     public static boolean saveBookmarks(String url)

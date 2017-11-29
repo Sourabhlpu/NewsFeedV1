@@ -74,7 +74,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
     private ArrayList<TheArticle> mBookmarks;
 
-    private HashMap<String, String> mBookmarkIds;
+    //private HashMap<String, String> mBookmarkIds;
 
 
     private  String page = "1";
@@ -155,7 +155,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         mBookmarks = new ArrayList<TheArticle>();
 
         //there is a bookmard id's for each bookmark stored on firebase. We store it there
-        mBookmarkIds = new HashMap<>();
+        //mBookmarkIds = new HashMap<>();
 
         //initializing the firebase realtime database
         mFirebaseDatabase = FirebaseDatabase.getInstance();
@@ -173,6 +173,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                HashMap<String, String> mBookmarkIds = new HashMap<>();
 
                 for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
                 {
@@ -181,6 +182,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
                 Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
                 NewsPreferences.setmBookmarkIds(mBookmarkIds);
+                startLoader();
 
             }
 
@@ -203,21 +205,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
 
-        //check if we are connected to the internet
-        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(getContext().CONNECTIVITY_SERVICE);
-        NetworkInfo info = cm.getActiveNetworkInfo();
 
-        //if we are connected then start the loader
-        if (info != null && info.isConnected()) {
-            LoaderManager loaderManager = getLoaderManager();
-            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
-
-        }
-        // otherwise hide the progress bar and show the appropriate error message
-        else {
-            rootView.findViewById(R.id.progress_bar).setVisibility(RecyclerView.GONE);
-            mEmptyTextView.setText("No internet connection");
-        }
 
 
         mRecyclerView.setHasFixedSize(true);
@@ -313,6 +301,24 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         return rootView;
     }
 
+    public void startLoader()
+    {
+        //check if we are connected to the internet
+        ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(getContext().CONNECTIVITY_SERVICE);
+        NetworkInfo info = cm.getActiveNetworkInfo();
+
+        //if we are connected then start the loader
+        if (info != null && info.isConnected()) {
+            LoaderManager loaderManager = getLoaderManager();
+            loaderManager.initLoader(EARTHQUAKE_LOADER_ID, null, this);
+
+        }
+        // otherwise hide the progress bar and show the appropriate error message
+        else {
+            getView().findViewById(R.id.progress_bar).setVisibility(RecyclerView.GONE);
+            mEmptyTextView.setText("No internet connection");
+        }    }
+
     @Override
     public void onClick(TheArticle article) {
 
@@ -391,7 +397,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                     .push()
                     .setValue(article.getmId());
 
+            getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
+            NewsPreferences.getmBookmarkIds().remove(article.getmId());
+
             Toast.makeText(getContext(), "Bookmarked", Toast.LENGTH_SHORT).show();
+
         }
         else
         {
@@ -402,6 +412,8 @@ public class MainActivityFragment extends Fragment implements android.support.v4
             NewsPreferences.getmBookmarkIds().remove(article.getmId());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
+
+            NewsPreferences.getmBookmarkIds().remove(article.getmId());
 
             Toast.makeText(getContext(), "Bookmark removed", Toast.LENGTH_SHORT).show();
 
