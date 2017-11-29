@@ -38,7 +38,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -173,11 +172,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         ValueEventListener valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                HashMap<String, String> mBookmarkIds = new HashMap<>();
+                ArrayList<String> mBookmarkIds = new ArrayList<>();
 
                 for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
                 {
-                    mBookmarkIds.put(bookmarkIdSnapshot.getValue().toString(), bookmarkIdSnapshot.getKey());
+                    mBookmarkIds.add(bookmarkIdSnapshot.getValue().toString());
                 }
 
                 Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
@@ -344,7 +343,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     @Override
     public void onBookmarkClick(TheArticle article) {
 
-       boolean isBookmarked = NewsPreferences.getmBookmarkIds().containsKey(article.getmId());
+       boolean isBookmarked = NewsPreferences.getmBookmarkIds().contains(article.getmId());
 
         /* if(!isBookmarked) {
             ContentValues values = new ContentValues();
@@ -398,7 +397,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                     .setValue(article.getmId());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
-            NewsPreferences.getmBookmarkIds().remove(article.getmId());
+            NewsPreferences.getmBookmarkIds().add(article.getmId());
 
             Toast.makeText(getContext(), "Bookmarked", Toast.LENGTH_SHORT).show();
 
@@ -407,8 +406,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         {
            mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
                    .child("bookmarkIds")
-                   .child(NewsPreferences.getmBookmarkIds().get(article.getmId()))
+                   .orderByValue().equalTo(article.getmId())
+                   .getRef()
                    .removeValue();
+
+
             NewsPreferences.getmBookmarkIds().remove(article.getmId());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
