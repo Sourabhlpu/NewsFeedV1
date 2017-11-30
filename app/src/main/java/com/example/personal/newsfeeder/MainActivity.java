@@ -3,6 +3,7 @@ package com.example.personal.newsfeeder;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,8 +15,16 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import static com.firebase.ui.auth.ui.AcquireEmailHelper.RC_SIGN_IN;
 
 
 /*
@@ -26,6 +35,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
+
+    ValueEventListener mValueEventListener;
+
+    private FirebaseAuth.AuthStateListener mAuthStateListener;
+
+    private FirebaseAuth mFirebaseAuth;
+
+    private FirebaseDatabase mFirebaseDatabase;
+    private DatabaseReference mDatabaseReference;
 
 
     private DrawerLayout mDrawer;
@@ -41,6 +59,12 @@ public class MainActivity extends AppCompatActivity {
 
         content = findViewById(R.id.content);
 
+        mFirebaseAuth = FirebaseAuth.getInstance();
+
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+
+        mDatabaseReference = mFirebaseDatabase.getReference().child("users");
+
         //this function sets up the toolbar
         initToolbar();
 
@@ -48,8 +72,41 @@ public class MainActivity extends AppCompatActivity {
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
+
+
+
+
         //function to setup the drawer layout.
         setupDrawerLayout(navigationView);
+
+        mAuthStateListener = new FirebaseAuth.AuthStateListener(){
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+
+                if(user != null)
+                {
+                    //user is signed in
+                    Toast.makeText(MainActivity.this,"You are signed in", Toast.LENGTH_SHORT).show();
+                    mDatabaseReference.child(user.getUid()).child("name").setValue(user.getDisplayName());
+                    mDatabaseReference.child(user.getUid()).child("email").setValue(user.getEmail());
+                    //mDatabaseReference.child(user.getUid()).child("bookmarks").push();
+                }
+                else {
+                    //user is signed out
+                    startActivityForResult(
+                            AuthUI.getInstance()
+                                    .createSignInIntentBuilder()
+                                    .setIsSmartLockEnabled(false)
+                                    .setProviders(
+                                            AuthUI.GOOGLE_PROVIDER,
+                                            AuthUI.EMAIL_PROVIDER)
+                                    .build(),
+                            RC_SIGN_IN);
+                }
+
+            }
+        };
 
         /*
          * The main content where the cardview's are displayed is a fragment.
@@ -242,4 +299,15 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+    }
 }
