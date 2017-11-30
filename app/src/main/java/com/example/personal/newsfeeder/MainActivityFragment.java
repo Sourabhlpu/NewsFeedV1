@@ -473,6 +473,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     public void onPause() {
         super.onPause();
         mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+
     }
 
     @Override
@@ -480,6 +481,8 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
+
+
 
 
 }
