@@ -24,8 +24,10 @@ public  final class NewsFeederDateUtils {
         String  monthWithYear = "";
 
         try {
-            Date date = completeDate.parse(dateFromApi);
-            monthWithYear = monthName.format(date);
+
+                Date date = completeDate.parse(dateFromApi);
+                monthWithYear = monthName.format(date);
+            
         } catch (ParseException e) {
             e.printStackTrace();
         }

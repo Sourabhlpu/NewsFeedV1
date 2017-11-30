@@ -113,7 +113,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     public void onLoadFinished(android.support.v4.content.Loader<List<TheArticle>> loader, List<TheArticle> articles) {
 
         //make the progress bar invisible as the data load has finished
-        getView().findViewById(R.id.progress_bar).setVisibility(RecyclerView.GONE);
+        getView().findViewById(R.id.progress_bar).setVisibility(RecyclerView.INVISIBLE);
 
         //check if we were successfully able to load the data by checking if the articles list is empty
         // if its not empty then update the adapter
@@ -127,7 +127,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         // if the articles list is not loaded then show the error message.
         else {
             mEmptyTextView.setText("No atricles found");
-            getView().findViewById(R.id.progress_bar).setVisibility(RecyclerView.GONE);
+            getView().findViewById(R.id.progress_bar).setVisibility(RecyclerView.INVISIBLE);
         }
 
 
