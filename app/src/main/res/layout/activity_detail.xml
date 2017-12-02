@@ -66,7 +66,7 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             android:orientation="vertical"
-            tools:context="com.example.personal.newsfeeder.DetailActivity">
+            tools:context="com.example.personal.newsfeeder.ui.activities.DetailActivity">
 
           <WebView
               android:layout_width="wrap_content"

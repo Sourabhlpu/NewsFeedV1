@@ -1,4 +1,4 @@
-package com.example.personal.newsfeeder;
+package com.example.personal.newsfeeder.ui.activities;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.webkit.WebView;
 import android.widget.TextView;
+
+import com.example.personal.newsfeeder.R;
 
 public class DetailActivity extends AppCompatActivity {
 

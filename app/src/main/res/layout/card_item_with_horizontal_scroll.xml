@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:background="#DDE6EC"
     android:orientation="vertical"
-    tools:context="com.example.personal.newsfeeder.MainActivity">
+    tools:context="com.example.personal.newsfeeder.ui.activities.MainActivity">
 
     <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/section_recycler_view"

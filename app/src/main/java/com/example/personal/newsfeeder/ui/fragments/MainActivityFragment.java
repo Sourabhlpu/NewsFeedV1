@@ -1,4 +1,4 @@
-package com.example.personal.newsfeeder;
+package com.example.personal.newsfeeder.ui.fragments;
 
 
 import android.content.Context;
@@ -25,7 +25,13 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.personal.newsfeeder.ArticleLoader;
+import com.example.personal.newsfeeder.ui.adapters.EndlessRecyclerViewScrollListener;
+import com.example.personal.newsfeeder.R;
+import com.example.personal.newsfeeder.ui.adapters.RVAdapter;
+import com.example.personal.newsfeeder.TheArticle;
 import com.example.personal.newsfeeder.data.NewsPreferences;
+import com.example.personal.newsfeeder.ui.activities.MainActivity;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;

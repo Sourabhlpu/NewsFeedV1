@@ -1,4 +1,4 @@
-package com.example.personal.newsfeeder;
+package com.example.personal.newsfeeder.ui.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.personal.newsfeeder.R;
+import com.example.personal.newsfeeder.Section;
 
 import java.util.ArrayList;
 import java.util.List;

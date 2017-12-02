@@ -1,4 +1,4 @@
-package com.example.personal.newsfeeder;
+package com.example.personal.newsfeeder.ui.adapters;
 
 import android.content.Context;
 import android.support.v7.widget.CardView;
@@ -11,6 +11,8 @@ import android.view.ViewStub;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.personal.newsfeeder.R;
+import com.example.personal.newsfeeder.TheArticle;
 import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.utilities.NewsFeederDateUtils;
 import com.squareup.picasso.Picasso;

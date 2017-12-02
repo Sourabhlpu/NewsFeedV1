@@ -1,4 +1,4 @@
-package com.example.personal.newsfeeder;
+package com.example.personal.newsfeeder.ui.activities;
 
 
 import android.content.Intent;
@@ -17,6 +17,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.personal.newsfeeder.R;
+import com.example.personal.newsfeeder.ui.fragments.BookmarkFragment;
+import com.example.personal.newsfeeder.ui.fragments.MainActivityFragment;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;

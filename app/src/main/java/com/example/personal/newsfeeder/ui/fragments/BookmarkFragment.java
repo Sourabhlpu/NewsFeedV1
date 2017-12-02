@@ -1,4 +1,4 @@
-package com.example.personal.newsfeeder;
+package com.example.personal.newsfeeder.ui.fragments;
 
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -16,6 +16,10 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.personal.newsfeeder.ui.adapters.BookmarkAdapter;
+import com.example.personal.newsfeeder.ui.adapters.EndlessRecyclerViewScrollListener;
+import com.example.personal.newsfeeder.R;
+import com.example.personal.newsfeeder.TheArticle;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
