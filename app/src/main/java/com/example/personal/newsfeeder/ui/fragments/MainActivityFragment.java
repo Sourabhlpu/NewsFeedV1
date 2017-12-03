@@ -324,7 +324,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     @Override
     public void onBookmarkClick(TheArticle article) {
 
-        boolean isBookmarked = NewsPreferences.getmBookmarkIds().contains(article.getmId());
+        boolean isBookmarked = NewsPreferences.getmBookmarkIds(getContext()).contains(article.getmId());
 
         /* if(!isBookmarked) {
             ContentValues values = new ContentValues();
@@ -378,7 +378,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                     .setValue(article.getmId());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
-            NewsPreferences.getmBookmarkIds().add(article.getmId());
+            NewsPreferences.getmBookmarkIds(getContext()).add(article.getmId());
 
             Toast.makeText(getContext(), "Bookmarked", Toast.LENGTH_SHORT).show();
 
@@ -390,11 +390,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                     .removeValue();
 
 
-            NewsPreferences.getmBookmarkIds().remove(article.getmId());
+            NewsPreferences.getmBookmarkIds(getContext()).remove(article.getmId());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
 
-            NewsPreferences.getmBookmarkIds().remove(article.getmId());
+            NewsPreferences.getmBookmarkIds(getContext()).remove(article.getmId());
 
             Toast.makeText(getContext(), "Bookmark removed", Toast.LENGTH_SHORT).show();
 

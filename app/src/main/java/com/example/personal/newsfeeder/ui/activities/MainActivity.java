@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
-                NewsPreferences.setmBookmarkIds(mBookmarkIds);
+                NewsPreferences.setmBookmarkIds(mBookmarkIds,MainActivity.this);
 
             }
 

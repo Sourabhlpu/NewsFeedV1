@@ -7,6 +7,8 @@ import android.preference.PreferenceManager;
 import com.example.personal.newsfeeder.R;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by personal on 8/29/2017.
@@ -18,14 +20,36 @@ public class NewsPreferences {
 
     private static ArrayList<String> mBookmarkIds;
 
-    public static ArrayList<String> getmBookmarkIds()
+    public static ArrayList<String> getmBookmarkIds(Context context)
     {
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        Set<String> set = pref.getStringSet("List",null);
+
+        if(set == null)
+        {
+            mBookmarkIds = new ArrayList<>();
+        }
+        else
+        {
+            mBookmarkIds = new ArrayList<String>(set);
+        }
+
+
+
         return mBookmarkIds;
     }
 
-    public static void setmBookmarkIds(ArrayList<String> bookmarkIds)
+    public static void setmBookmarkIds(ArrayList<String> bookmarkIds, Context context)
     {
-        mBookmarkIds = bookmarkIds;
+        SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        Set<String> set = new HashSet<String>();
+        set.addAll(bookmarkIds);
+
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putStringSet("List",set);
+        editor.commit();
     }
 
     public static boolean saveBookmarks(String url)
