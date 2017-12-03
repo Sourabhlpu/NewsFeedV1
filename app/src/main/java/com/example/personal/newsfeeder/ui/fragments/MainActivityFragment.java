@@ -26,21 +26,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.personal.newsfeeder.ArticleLoader;
-import com.example.personal.newsfeeder.ui.adapters.EndlessRecyclerViewScrollListener;
 import com.example.personal.newsfeeder.R;
-import com.example.personal.newsfeeder.ui.adapters.RVAdapter;
 import com.example.personal.newsfeeder.TheArticle;
 import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.ui.activities.MainActivity;
+import com.example.personal.newsfeeder.ui.adapters.EndlessRecyclerViewScrollListener;
+import com.example.personal.newsfeeder.ui.adapters.RVAdapter;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -62,7 +59,6 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
 
-
     private RecyclerView mRecyclerView;
     private RVAdapter mAdapter;
     private LinearLayoutManager mLayoutManager;
@@ -82,7 +78,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     //private HashMap<String, String> mBookmarkIds;
 
 
-    private  String page = "1";
+    private String page = "1";
 
 
     @Override
@@ -103,7 +99,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     public android.support.v4.content.Loader<List<TheArticle>> onCreateLoader(int id, Bundle args) {
 
 
-        URL queryUrl = NetworkUtils.createAPIQueryString(page,getContext());
+        URL queryUrl = NetworkUtils.createAPIQueryString(page, getContext());
 
 
         return new ArticleLoader(getContext(), queryUrl);
@@ -150,13 +146,28 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        final View rootView = inflater.inflate(R.layout.main_activity_fragment,container,false);
+        final View rootView = inflater.inflate(R.layout.main_activity_fragment, container, false);
 
+
+        initializeMemberVariables(rootView);
+
+        initializeListeners();
+
+        setupRecyclerView();
+
+        startLoader();
+
+
+        return rootView;
+    }
+
+
+    private void initializeMemberVariables(View rootView) {
         //initializing the firebase auth variable
         mFirebaseAuth = FirebaseAuth.getInstance();
 
 
-       // this stores all the bookmars that are stored in the firebase
+        // this stores all the bookmars that are stored in the firebase
         mBookmarks = new ArrayList<TheArticle>();
 
         //there is a bookmard id's for each bookmark stored on firebase. We store it there
@@ -167,41 +178,6 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         //get a reference to users object in firebase database
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
 
-        /*
-         * we want to read all the bookmardIds that are stored in the firebase database.
-         * we want to save all those ids in a hashmap
-         * after its savend in the hashmap we want to save that hashmap in the shared preferences
-         * so that when the recyclerview creates the list items it automatically displays all the
-         * items that were bookmarked already.
-         */
-
-        ValueEventListener valueEventListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<String> mBookmarkIds = new ArrayList<>();
-
-                for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
-                {
-                    mBookmarkIds.add(bookmarkIdSnapshot.getValue().toString());
-                }
-
-                Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
-                NewsPreferences.setmBookmarkIds(mBookmarkIds);
-                startLoader();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-
-        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
-                .child("bookmarkIds")
-                .addListenerForSingleValueEvent(valueEventListener);
-
-
 
         //mEmptyTextView is used to display an error message when we cannot load the data
         mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_text_view);
@@ -209,16 +185,19 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         //this is the recycler view that displays the data in the list
         mRecyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
+        mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_text_view);
+
+        mLayoutManager = new LinearLayoutManager(getContext());
+    }
 
 
 
+    private void setupRecyclerView() {
 
         mRecyclerView.setHasFixedSize(true);
 
-        mEmptyTextView = (TextView) rootView.findViewById(R.id.empty_text_view);
 
 
-        mLayoutManager = new LinearLayoutManager(getContext());
 
         mRecyclerView.setLayoutManager(mLayoutManager);
 
@@ -235,20 +214,26 @@ public class MainActivityFragment extends Fragment implements android.support.v4
          */
 
 
-                mAdapter = new RVAdapter(getContext(), new ArrayList<TheArticle>(), this, this,this);
-                mRecyclerView.setAdapter(mAdapter);
+        mAdapter = new RVAdapter(getContext(), new ArrayList<TheArticle>(), this, this, this);
+        mRecyclerView.setAdapter(mAdapter);
+
+        //adding the onScrollListener for the recycler view
+
+        mRecyclerView.addOnScrollListener(scrollListener);
+
+        scrollListener.resetState();
+    }
 
 
+    private void initializeListeners()
+    {
 
-        /*
+          /*
          * EndlessRecyclerViewScrollListener class is an abstract class that extends RecyclerView's
          * OnScrollListener class. This is used for infinite loading of data
          * Here we initialize the class. We pass in the layoutManager that our recycler uses
          *
          */
-
-
-
         scrollListener = new EndlessRecyclerViewScrollListener(mLayoutManager) {
 
             /*
@@ -267,27 +252,19 @@ public class MainActivityFragment extends Fragment implements android.support.v4
             }
         };
 
-        //adding the onScrollListener for the recycler view
 
-        mRecyclerView.addOnScrollListener(scrollListener);
-
-        scrollListener.resetState();
-
-
-        mAuthStateListener = new FirebaseAuth.AuthStateListener(){
+        mAuthStateListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
 
-                if(user != null)
-                {
+                if (user != null) {
                     //user is signed in
-                    Toast.makeText(getContext(),"You are signed in", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "You are signed in", Toast.LENGTH_SHORT).show();
                     mDatabaseReference.child(user.getUid()).child("name").setValue(user.getDisplayName());
                     mDatabaseReference.child(user.getUid()).child("email").setValue(user.getEmail());
                     //mDatabaseReference.child(user.getUid()).child("bookmarks").push();
-                }
-                else {
+                } else {
                     //user is signed out
                     startActivityForResult(
                             AuthUI.getInstance()
@@ -302,12 +279,9 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
             }
         };
-
-        return rootView;
     }
 
-    public void startLoader()
-    {
+    public void startLoader() {
         //check if we are connected to the internet
         ConnectivityManager cm = (ConnectivityManager) getContext().getSystemService(getContext().CONNECTIVITY_SERVICE);
         NetworkInfo info = cm.getActiveNetworkInfo();
@@ -322,7 +296,8 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         else {
             getView().findViewById(R.id.progress_bar).setVisibility(RecyclerView.GONE);
             mEmptyTextView.setText("No internet connection");
-        }    }
+        }
+    }
 
     @Override
     public void onClick(TheArticle article) {
@@ -332,8 +307,8 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         Uri uri = Uri.parse(uriString);
         CustomTabsIntent.Builder intentBuilder = new CustomTabsIntent.Builder();
 
-        intentBuilder.setToolbarColor(ContextCompat.getColor(getContext(),R.color.colorPrimary));
-        intentBuilder.setSecondaryToolbarColor(ContextCompat.getColor(getContext(),R.color.colorPrimaryDark));
+        intentBuilder.setToolbarColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
+        intentBuilder.setSecondaryToolbarColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
 
         intentBuilder.setExitAnimations(getContext(), R.anim.right_to_left_end,
                 R.anim.left_to_right_end);
@@ -342,14 +317,14 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
         CustomTabsIntent customTabsIntent = intentBuilder.build();
 
-        customTabsIntent.launchUrl(getActivity(),uri);
+        customTabsIntent.launchUrl(getActivity(), uri);
     }
 
 
     @Override
     public void onBookmarkClick(TheArticle article) {
 
-       boolean isBookmarked = NewsPreferences.getmBookmarkIds().contains(article.getmId());
+        boolean isBookmarked = NewsPreferences.getmBookmarkIds().contains(article.getmId());
 
         /* if(!isBookmarked) {
             ContentValues values = new ContentValues();
@@ -390,7 +365,7 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
        */
 
-        if(!isBookmarked) {
+        if (!isBookmarked) {
             mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
 
                     .child("bookmarks")
@@ -407,14 +382,12 @@ public class MainActivityFragment extends Fragment implements android.support.v4
 
             Toast.makeText(getContext(), "Bookmarked", Toast.LENGTH_SHORT).show();
 
-        }
-        else
-        {
-           mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
-                   .child("bookmarkIds")
-                   .orderByValue().equalTo(article.getmId())
-                   .getRef()
-                   .removeValue();
+        } else {
+            mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                    .child("bookmarkIds")
+                    .orderByValue().equalTo(article.getmId())
+                    .getRef()
+                    .removeValue();
 
 
             NewsPreferences.getmBookmarkIds().remove(article.getmId());
@@ -443,13 +416,10 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     }
 
 
-
-
-    public void fetchDataAfterSwipeUp(int currentPage)
-    {
+    public void fetchDataAfterSwipeUp(int currentPage) {
         mAdapter.clear();
 
-        page =  currentPage + "";
+        page = currentPage + "";
         //Log.v(LOG_TAG,"PAGE VALUE IN THE load.. function " + page);
         getLoaderManager().destroyLoader(EARTHQUAKE_LOADER_ID);
         getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, null, this);
@@ -487,8 +457,6 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         super.onResume();
         mFirebaseAuth.addAuthStateListener(mAuthStateListener);
     }
-
-
 
 
 }

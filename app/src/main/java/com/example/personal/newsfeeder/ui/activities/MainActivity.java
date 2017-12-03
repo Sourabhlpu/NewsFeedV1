@@ -12,20 +12,26 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.personal.newsfeeder.R;
+import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.ui.fragments.BookmarkFragment;
 import com.example.personal.newsfeeder.ui.fragments.MainActivityFragment;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 import static com.firebase.ui.auth.ui.AcquireEmailHelper.RC_SIGN_IN;
 
@@ -67,6 +73,39 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabase = FirebaseDatabase.getInstance();
 
         mDatabaseReference = mFirebaseDatabase.getReference().child("users");
+
+             /*
+         * we want to read all the bookmardIds that are stored in the firebase database.
+         * we want to save all those ids in a hashmap
+         * after its savend in the hashmap we want to save that hashmap in the shared preferences
+         * so that when the recyclerview creates the list items it automatically displays all the
+         * items that were bookmarked already.
+         */
+
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<String> mBookmarkIds = new ArrayList<>();
+
+                for(DataSnapshot bookmarkIdSnapshot : dataSnapshot.getChildren())
+                {
+                    mBookmarkIds.add(bookmarkIdSnapshot.getValue().toString());
+                }
+
+                Log.v(LOG_TAG, "the bookmark ids are " + mBookmarkIds);
+                NewsPreferences.setmBookmarkIds(mBookmarkIds);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
+                .child("bookmarkIds")
+                .addListenerForSingleValueEvent(valueEventListener);
 
         //this function sets up the toolbar
         initToolbar();
@@ -210,43 +249,6 @@ public class MainActivity extends AppCompatActivity {
         mDrawer.closeDrawers();
     }
 
-    /*private void setupDrawerLayout(NavigationView navigationView)
-    {
-
-
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                if(item.getTitle() == getResources().getString(R.string.favourite))
-                {
-                   mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
-                           .child("bookmarks")
-                           .addListenerForSingleValueEvent(new ValueEventListener() {
-                               @Override
-                               public void onDataChange(DataSnapshot dataSnapshot) {
-                                   for(DataSnapshot bookmarkSnapShot : dataSnapshot.getChildren()) {
-                                       TheArticle bookmark = bookmarkSnapShot.getValue(TheArticle.class);
-                                       mBookmarks.add(bookmark);
-                                       //mAdapter.replaceAll(mBookmarks);
-                                       Log.v(LOG_TAG, "the retrieved bookmark object is " + bookmark);
-                                   }
-                               }
-
-                               @Override
-                               public void onCancelled(DatabaseError databaseError) {
-
-                               }
-                           });
-
-                }
-                Snackbar.make(content, item.getTitle() + " pressed", Snackbar.LENGTH_LONG).show();
-                item.setChecked(true);
-                drawerLayout.closeDrawers();
-                return true;
-            }
-        });
-
-    }*/
 
     private void initToolbar() {
         //find the toolbar in the recycler_view.xml file.
