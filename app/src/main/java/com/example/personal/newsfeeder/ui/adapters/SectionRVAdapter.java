@@ -23,15 +23,24 @@ public class SectionRVAdapter extends RecyclerView.Adapter<SectionRVAdapter.Sect
 
     List<Section> mSection;
     Context mContext;
+    final private HorizontalListItemClickHandler mOnHorizontalListItemClickListener;
 
-    public SectionRVAdapter(Context context, ArrayList<Section> sections)
+
+    public interface HorizontalListItemClickHandler{
+
+        void onClick(String section);
+    }
+
+    public SectionRVAdapter(Context context, ArrayList<Section> sections,
+                            HorizontalListItemClickHandler horizontalListItemClickHandler)
     {
         mContext = context;
         mSection = sections;
+        mOnHorizontalListItemClickListener = horizontalListItemClickHandler;
 
     }
 
-    public static class SectionViewHolder extends RecyclerView.ViewHolder
+    public  class SectionViewHolder extends RecyclerView.ViewHolder
     {
         CardView cardView;
         ImageView imageView;
@@ -43,6 +52,14 @@ public class SectionRVAdapter extends RecyclerView.Adapter<SectionRVAdapter.Sect
             cardView = (CardView)itemView.findViewById(R.id.section_card_view);
             imageView = (ImageView)itemView.findViewById(R.id.section_image);
             textView = (TextView)itemView.findViewById(R.id.section_text);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int position = getAdapterPosition();
+                    mOnHorizontalListItemClickListener.onClick(mSection.get(position).getmSectionName());
+                }
+            });
 
         }
 

@@ -30,8 +30,10 @@ import com.example.personal.newsfeeder.R;
 import com.example.personal.newsfeeder.TheArticle;
 import com.example.personal.newsfeeder.data.NewsPreferences;
 import com.example.personal.newsfeeder.ui.activities.MainActivity;
+import com.example.personal.newsfeeder.ui.activities.SectionActivity;
 import com.example.personal.newsfeeder.ui.adapters.EndlessRecyclerViewScrollListener;
 import com.example.personal.newsfeeder.ui.adapters.RVAdapter;
+import com.example.personal.newsfeeder.ui.adapters.SectionRVAdapter;
 import com.example.personal.newsfeeder.utilities.NetworkUtils;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -48,7 +50,8 @@ import java.util.List;
  */
 
 public class MainActivityFragment extends Fragment implements android.support.v4.app.LoaderManager.LoaderCallbacks<List<TheArticle>>,
-        RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler, RVAdapter.ShareOnClickHandler {
+        RVAdapter.ListItemOnClickHandler, RVAdapter.BookmarkOnClickHandler, RVAdapter.ShareOnClickHandler,
+        SectionRVAdapter.HorizontalListItemClickHandler{
 
     //we give the loader an id. This is just a random unique value.
     private static final int EARTHQUAKE_LOADER_ID = 1;
@@ -324,46 +327,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
     @Override
     public void onBookmarkClick(TheArticle article) {
 
+        ArrayList<String> tempBoomakrIds;
+
         boolean isBookmarked = NewsPreferences.getmBookmarkIds(getContext()).contains(article.getmId());
 
-        /* if(!isBookmarked) {
-            ContentValues values = new ContentValues();
 
-            values.put(NewsContract.NewsEntry.COLUMN_NAME, article.getmAvatarName());
-            values.put(NewsContract.NewsEntry.COLUMN_DATE, article.getmDate());
-            values.put(NewsContract.NewsEntry.IMAGE_URL, article.getmImageURL());
-            values.put(NewsContract.NewsEntry.TITLE, article.getmTheTitle());
-            values.put(NewsContract.NewsEntry.ShortDescription, article.getmTheThreeLines());
-            values.put(NewsContract.NewsEntry.DetailPageLink, article.getmDetailPageLink());
-            values.put(NewsContract.NewsEntry.linkId,article.getmId());
-
-            Uri insertedUri = this.getContentResolver().insert(NewsContract.NewsEntry.CONTENT_URI, values);
-
-            Log.v(LOG_TAG, insertedUri + "");
-
-            findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
-
-            NewsPreferences.saveBookmark(article.getmId(),this);
-
-            if (insertedUri != null) {
-                Toast.makeText(this, "Bookmarked", Toast.LENGTH_SHORT).show();
-            }
-        }
-        else
-        {
-            String[] selectionArgs = new String[]{article.getmId()};
-            //delete the bookmark
-
-            int numOfRowsDeleted = this.getContentResolver().delete(NewsContract.NewsEntry.CONTENT_URI,
-                    NewsContract.NewsEntry.linkId + "=?",selectionArgs);
-            if(numOfRowsDeleted > 0) {
-                NewsPreferences.removeBookmark(article.getmId(),this);
-                findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
-                Toast.makeText(this, "Bookmark Removed", Toast.LENGTH_SHORT).show();
-            }
-        }
-
-       */
 
         if (!isBookmarked) {
             mDatabaseReference.child(mFirebaseAuth.getCurrentUser().getUid())
@@ -378,7 +346,11 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                     .setValue(article.getmId());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark);
-            NewsPreferences.getmBookmarkIds(getContext()).add(article.getmId());
+
+            tempBoomakrIds = NewsPreferences.getmBookmarkIds(getContext());
+            tempBoomakrIds.add(article.getmId());
+
+            NewsPreferences.setmBookmarkIds(tempBoomakrIds,getContext());
 
             Toast.makeText(getContext(), "Bookmarked", Toast.LENGTH_SHORT).show();
 
@@ -390,11 +362,14 @@ public class MainActivityFragment extends Fragment implements android.support.v4
                     .removeValue();
 
 
-            NewsPreferences.getmBookmarkIds(getContext()).remove(article.getmId());
+            tempBoomakrIds = NewsPreferences.getmBookmarkIds(getContext());
+            tempBoomakrIds.remove(article.getmId());
+
+            NewsPreferences.setmBookmarkIds(tempBoomakrIds,getContext());
 
             getView().findViewById(R.id.bookmark_image).setBackgroundResource(R.drawable.bookmark_outline);
 
-            NewsPreferences.getmBookmarkIds(getContext()).remove(article.getmId());
+
 
             Toast.makeText(getContext(), "Bookmark removed", Toast.LENGTH_SHORT).show();
 
@@ -443,6 +418,15 @@ public class MainActivityFragment extends Fragment implements android.support.v4
         //Log.v(LOG_TAG,"PAGE VALUE IN THE load.. function " + page);
         getLoaderManager().destroyLoader(EARTHQUAKE_LOADER_ID);
         getLoaderManager().restartLoader(EARTHQUAKE_LOADER_ID, null, this);
+    }
+
+    @Override
+    public void onClick(String section) {
+
+        Intent intent = new Intent(getContext(), SectionActivity.class);
+        intent.putExtra("Section Type",section);
+        startActivity(intent);
+
     }
 
     @Override

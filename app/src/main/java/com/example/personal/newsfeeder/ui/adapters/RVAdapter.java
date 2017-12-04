@@ -16,6 +16,7 @@ import com.example.personal.newsfeeder.R;
 import com.example.personal.newsfeeder.Section;
 import com.example.personal.newsfeeder.TheArticle;
 import com.example.personal.newsfeeder.data.NewsPreferences;
+import com.example.personal.newsfeeder.ui.fragments.MainActivityFragment;
 import com.example.personal.newsfeeder.utilities.NewsFeederDateUtils;
 import com.squareup.picasso.Picasso;
 
@@ -376,7 +377,7 @@ public class RVAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
 
         holder.horizontalList.setLayoutManager(new LinearLayoutManager(holder.context, LinearLayoutManager.HORIZONTAL, false));
-        holder.horizontalAdapter = new SectionRVAdapter(holder.context,holder.sections);
+        holder.horizontalAdapter = new SectionRVAdapter(holder.context,holder.sections, new MainActivityFragment());
         holder.horizontalList.setAdapter(holder.horizontalAdapter);
         holder.horizontalAdapter.setDataset(holder.sections);
 
